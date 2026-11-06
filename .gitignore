@@ -1,0 +1,12 @@
+# WorkBuddy 项目内部数据（记忆/会话/配置，含敏感信息，不入库）
+.workbuddy/
+
+# 旧版/备份文件，不属于当前项目
+_old/
+
+# 临时文件
+*.tmp
+__*.js
+*~
+.DS_Store
+Thumbs.db

@@ -1,0 +1,478 @@
+:root{
+  --bg:#f5f7fa; --panel:#ffffff; --line:#e3e8ef; --text:#1f2933;
+  --muted:#7b8794; --primary:#2f6fed; --primary-d:#1f55c4;
+  --warn:#d97706; --warn-bg:#fff4e0; --danger:#dc2626; --ok:#15803d;
+  --chip:#eef2ff; --chip-t:#3b5bdb;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"Microsoft YaHei","PingFang SC",-apple-system,Segoe UI,sans-serif;
+  background:var(--bg);color:var(--text);font-size:15px;line-height:1.5;}
+header{background:var(--primary);color:#fff;padding:13px 22px;display:flex;
+  align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+header h1{font-size:18px;margin:0;font-weight:600;}
+header .meta{font-size:13px;opacity:.9;}
+.layout{display:flex;min-height:calc(100vh - 56px);}
+nav{width:186px;background:var(--panel);border-right:1px solid var(--line);padding:12px 0;flex:0 0 auto;}
+nav a{display:block;padding:10px 20px;color:var(--text);text-decoration:none;font-size:14.5px;
+  border-left:3px solid transparent;cursor:pointer;}
+nav a:hover{background:var(--bg);}
+nav a.active{background:#eaf1ff;border-left-color:var(--primary);color:var(--primary-d);font-weight:600;}
+main{flex:1;padding:20px 26px;overflow:auto;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:16px;}
+.card h2{margin:0 0 12px;font-size:16px;}
+.card h3{margin:0 0 10px;font-size:14.5px;}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px;}
+label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px;}
+input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--line);
+  border-radius:7px;background:#fff;color:var(--text);width:100%;}
+textarea{resize:vertical;min-height:86px;font-family:Consolas,Monaco,monospace;}
+button{font-family:inherit;font-size:14px;padding:8px 15px;border:1px solid transparent;border-radius:7px;
+  background:var(--primary);color:#fff;cursor:pointer;}
+button:hover{background:var(--primary-d);}
+button.ghost{background:#fff;color:var(--primary);border-color:var(--primary);}
+button.ghost:hover{background:#eaf1ff;}
+button.danger{background:#fff;color:var(--danger);border-color:var(--danger);}
+button.danger:hover{background:#fdeaea;}
+button.bwarn{background:#fff;color:var(--warn);border-color:#efc98a;}
+button.bwarn:hover{background:var(--warn-bg);}
+button.sm{padding:5px 11px;font-size:13px;}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0;line-height:1.6;}
+table{width:100%;border-collapse:collapse;font-size:14px;}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;}
+th{background:var(--bg);color:var(--muted);font-weight:600;font-size:13px;}
+tr:hover td{background:#fafcff;}
+.tag{display:inline-block;background:var(--chip);color:var(--chip-t);border-radius:20px;
+  padding:2px 10px;font-size:12.5px;margin:2px 4px 2px 0;}
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:12px;}
+.badge.warn{background:var(--warn-bg);color:var(--warn);}
+.badge.ok{background:#e7f6ec;color:var(--ok);}
+/* ---- 缺考 ---- */
+/* 用琥珀色而非灰色：缺考是需要跟进的信息，不是「没有信息」 */
+.absent-tag{display:inline-block;background:#fef3c7;color:#92400e;
+  border-radius:6px;padding:1px 8px;font-size:12px;font-weight:600;white-space:nowrap;}
+/* 名册表：分数输入框对齐、勾选框别被拉太宽 */
+.ro-score{width:100%;text-align:right;}
+.ro-abs{width:auto;}
+/* 2K 屏下名册一行放得下，别让输入框把行高撑爆 */
+table input[type=number]{padding:5px 7px;}
+.search{width:260px;}
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.45);display:none;align-items:center;justify-content:center;z-index:50;}
+.modal-bg.show{display:flex;}
+.modal{background:#fff;border-radius:12px;padding:20px 22px;width:520px;max-width:92vw;max-height:88vh;overflow:auto;}
+.modal h3{margin:0 0 14px;font-size:17px;}
+/* 截止前 3 分钟提醒：独立最顶层弹窗，盖过其它所有弹窗（z-index 远高于 .modal-bg 的 50） */
+.reminder-bg{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;z-index:99999;animation:rem-fade .18s ease;}
+.reminder-bg.show{display:flex;}
+.reminder-card{background:#fff;border-radius:14px;padding:26px 28px;width:460px;max-width:92vw;border-top:6px solid #ef4444;box-shadow:0 24px 60px rgba(0,0,0,.35);text-align:center;}
+.reminder-badge{display:inline-block;background:#fee2e2;color:#dc2626;font-weight:700;font-size:13px;padding:4px 12px;border-radius:999px;margin-bottom:12px;}
+.reminder-title{margin:0 0 10px;font-size:21px;line-height:1.4;color:#111827;word-break:break-word;}
+.reminder-meta{margin:0 0 6px;font-size:15px;color:#374151;}
+.reminder-tip{margin:0 0 18px;font-size:14px;color:#6b7280;}
+.reminder-actions{justify-content:center;gap:10px;}
+@keyframes rem-fade{from{opacity:0}to{opacity:1}}
+.field{margin-bottom:12px;}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#1f2933;color:#fff;
+  padding:10px 18px;border-radius:8px;font-size:14px;z-index:80;opacity:0;transition:opacity .25s;pointer-events:none;}
+.toast.show{opacity:1;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:1100px){.grid4{grid-template-columns:repeat(2,1fr);}}
+/* 成绩涨跌：红涨绿跌（中国习惯） */
+.up{color:#dc2626;font-weight:600;}
+.down{color:#15803d;font-weight:600;}
+.stat{background:var(--bg);border-radius:9px;padding:12px 14px;}
+.stat-num{font-size:24px;font-weight:700;color:var(--primary-d);}
+.stat-lbl{font-size:12.5px;color:var(--muted);}
+.kpbar{display:flex;align-items:center;gap:10px;margin:7px 0;}
+.kpbar .name{width:150px;font-size:13.5px;}
+.kpbar .track{flex:1;background:var(--bg);border-radius:6px;height:18px;overflow:hidden;}
+.kpbar .fill{height:100%;background:var(--primary);}
+.kpbar .cnt{width:44px;text-align:right;font-size:13px;color:var(--muted);}
+svg{display:block;max-width:100%;}
+/* 图表不跟着卡片无限拉宽：2K 屏上折线图被拉到一千多像素宽，
+   点和标签就散得看不清、右下角的文字也容易被卡片边角挤掉。
+   给一个宽度上限，超出就居中，两侧留白反而更好读。 */
+.chart-box{max-width:760px;margin:0 auto;}
+.chart-box svg{width:100%;height:auto;}
+.muted{color:var(--muted);font-size:13px;}
+.err{color:var(--danger);font-size:13px;}
+.ok-t{color:var(--ok);font-size:13px;}
+.empty{padding:22px;text-align:center;color:var(--muted);font-size:13.5px;}
+
+/* 顶部两卡并排（待办事项已移到下方整行） */
+/* 首页今日课程：独占整行，列宽固定。字号按 2K 屏（约 2400px 宽）放大到一档半 */
+.today-tbl{table-layout:fixed;width:100%;}
+.today-tbl th{background:var(--bg);color:var(--muted);font-weight:600;font-size:16px;
+  padding:11px 12px;text-align:left;border-bottom:1px solid var(--line);}
+.today-tbl th.p{width:66px;text-align:center;}
+.today-tbl th.tm{width:158px;}
+.today-tbl th.sb{width:126px;}
+.today-tbl th.ct,.today-tbl th.hw{width:auto;}
+.today-tbl td{border-bottom:1px solid var(--line);padding:14px 12px;vertical-align:top;}
+.today-tbl tr:last-child td{border-bottom:none;}
+.today-tbl tr:hover td{background:#fafcff;}
+.today-tbl td.p{text-align:center;color:var(--muted);font-size:18px;font-weight:600;padding-top:16px;}
+.today-tbl td.tm{color:var(--muted);font-size:17px;font-family:Consolas,Monaco,monospace;padding-top:16px;}
+.today-tbl td.sb{font-size:20px;padding-top:11px;}
+.today-tbl td.sb b{font-weight:600;}
+.today-tbl td.sb .tag{font-size:14px;padding:3px 12px;}
+/* 薄弱知识点：格内直接点着输入 */
+td.kp-cell{cursor:text;}
+td.kp-cell:hover{background:#f4f8ff;}
+td.kp-cell .kp-ph{color:#c3ccd8;font-size:13px;}
+.kp-tag{cursor:pointer;}
+.kp-tag:hover{background:#dbe4ff;}
+.kp-profile{min-height:34px;padding:6px 8px;border:1px dashed var(--line);border-radius:7px;}
+.kp-profile:hover{border-color:var(--primary);background:#f7faff;}
+input.kp-inline{font-size:14px;padding:4px 8px;border:1px solid var(--primary);border-radius:6px;
+  background:#fff;color:var(--text);min-width:120px;box-sizing:border-box;}
+
+/* 内容 / 作业：点一下就能输入 */
+.today-tbl td.ct,.today-tbl td.hw{cursor:text;font-size:17.5px;line-height:1.7;color:var(--text);
+  word-break:break-word;white-space:pre-wrap;}
+.today-tbl td.ct:hover,.today-tbl td.hw:hover{background:#f4f8ff;}
+.today-tbl td.ct .ph,.today-tbl td.hw .ph{color:#c3ccd8;font-size:17px;}
+textarea.inline-edit{width:100%;min-height:84px;font-size:17.5px;line-height:1.7;
+  padding:9px 11px;resize:vertical;border:1px solid var(--primary);border-radius:6px;
+  font-family:inherit;background:#fff;color:var(--text);display:block;
+  box-sizing:border-box;}
+  /* 编辑时 JS 会量出原行高并写进 style.height/min-height，保证编辑前后一样高 */
+
+.dash-hero{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:16px;}
+.dash-hero .d{font-size:17px;color:var(--muted);}
+.dash-hero .big{font-size:28px;font-weight:700;margin-top:2px;}
+.dash-hero .muted{font-size:16.5px;}
+/* 首页两大板块（今日课程 / 待办事项）整体放大，2K 屏一屏就能看完 */
+.dash-card{padding:20px 24px;}
+.dash-card h2{font-size:22px;margin-bottom:16px;}
+
+.sched{border-collapse:collapse;width:100%;table-layout:fixed;}
+.sched th{background:var(--bg);padding:8px 6px;font-size:12.5px;color:var(--muted);text-align:center;}
+.sched th:first-child{width:56px;}
+.sched th.th-time{width:86px;}
+.sched th.th-per{width:50px;}
+.sched th.is-today{color:#2f6fed;font-weight:600;}
+/* 周次表头：星期后面跟一个日期（M/D），让「周一/周二…」直接带日期 */
+.sched th .wd-date{font-size:13px;font-weight:400;color:var(--muted);margin-left:5px;}
+.sched th.is-today .wd-date{color:#2f6fed;opacity:.85;}
+.sched td{border:1px solid var(--line);height:72px;vertical-align:middle;padding:6px 6px;
+  text-align:center;cursor:pointer;}
+.sched td:hover{background:#fafcff;}
+.sched td.p:hover{background:var(--bg);}
+.sched td.today{background:#eef4ff;}
+/* 我带的班（15/16班）的数学课 —— 浅绿色填充 */
+.sched td.math{background:#e8f6ed;}
+.sched td.math:hover{background:#d8efe0;}
+.sched td.math.today{background:#dff0e6;}
+.sched .c-sub{font-size:16px;font-weight:600;line-height:1.35;}
+.sched .c-meta{font-size:12.5px;color:var(--muted);line-height:1.35;margin-top:2px;}
+.sched .c-sub2{font-size:12px;color:var(--muted);line-height:1.4;margin-top:3px;
+  border-top:1px dashed #d8e0ea;padding-top:3px;max-height:2.8em;overflow:hidden;}
+.sched .c-sub2.hw{color:var(--warn);}
+.sched .p{background:var(--bg);color:var(--muted);font-size:15px;font-weight:600;text-align:center;
+  vertical-align:middle;cursor:default;}
+.sched .ptime{background:#fafbfc;color:var(--muted);font-size:12.5px;text-align:center;line-height:1.45;
+  cursor:pointer;padding:6px 3px;white-space:nowrap;vertical-align:middle;}
+.sched .ptime:hover{background:var(--warn-bg);color:var(--warn);}
+.legend{display:inline-flex;align-items:center;gap:14px;margin-left:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);}
+.legend .lg{width:11px;height:11px;border-radius:3px;border:1px solid var(--line);display:inline-block;
+  margin-right:5px;vertical-align:-1px;}
+.legend .lg-math{background:#e8f6ed;border-color:#b7ddc4;}
+.sched .legend{gap:5px;margin-left:14px;font-size:12.5px;}
+.sched .legend .lg{margin-right:0;}
+
+.todo{display:flex;gap:10px;align-items:center;padding:9px 4px;border-bottom:1px solid var(--line);}
+.todo:last-child{border-bottom:none;}
+.todo .box{width:auto;margin-top:3px;flex:0 0 auto;}
+.todo .txt{flex:1;font-size:14px;word-break:break-word;cursor:text;}
+.todo.done .txt{text-decoration:line-through;color:var(--muted);cursor:default;}
+.todo .side{display:flex;align-items:center;gap:6px;flex:0 0 auto;}
+/* 拖拽把手：⠿ 上下移动调顺序 */
+.todo .grip{cursor:grab;color:#b6c0cc;font-size:15px;flex:0 0 auto;user-select:none;
+  padding:0 2px;letter-spacing:-2px;}
+.todo .grip:active{cursor:grabbing;}
+.todo.dragging{background:#eef4ff;opacity:.5;}
+.todo.drop-before{border-top:2px solid var(--primary);}
+.todo-hist .todo{opacity:.85;}
+/* 首页待办区放大（只影响首页，成长记录等其他页面不受影响） */
+.dash-card .todo{padding:15px 6px;gap:12px;}
+.dash-card .todo .txt{font-size:18px;line-height:1.6;}
+.dash-card .todo .grip{font-size:19px;padding:0 4px;}
+.dash-card .todo button.sm{font-size:16px;padding:8px 16px;}
+.dash-card .tabs{gap:8px;margin-bottom:14px;}
+.dash-card .tabs .tab{font-size:17px;padding:8px 18px;}
+.dash-card .empty{font-size:17px;padding:34px;}
+.dash-card .hint{font-size:15.5px;line-height:1.65;}
+.dash-card .todo-hist .muted{font-size:15.5px;}
+.dash-card .tabs button.sm{font-size:16px;padding:8px 16px;}
+/* 「完成」按钮：绿色 */
+button.ok{background:#fff;color:var(--ok);border-color:#86d3a3;}
+button.ok:hover{background:#e7f6ec;}
+.pri{font-size:11.5px;padding:1px 8px;border-radius:10px;white-space:nowrap;}
+.pri.high{background:#fdeaea;color:#dc2626;}
+.pri.mid{background:#fff4e0;color:#d97706;}
+.pri.low{background:#eef2ff;color:#3b5bdb;}
+.due{font-size:11.5px;color:var(--muted);white-space:nowrap;}
+.due.over{color:#dc2626;font-weight:500;}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.tab{padding:5px 12px;font-size:13px;border:1px solid var(--line);background:#fff;border-radius:16px;cursor:pointer;color:var(--muted);}
+.tab.on{background:var(--primary);border-color:var(--primary);color:#fff;font-weight:500;}
+
+.evt{display:flex;gap:12px;align-items:center;padding:9px 4px;border-bottom:1px solid var(--line);}
+.evt:last-child{border-bottom:none;}
+.evt .days{min-width:52px;text-align:center;line-height:1.1;}
+.evt .days b{font-size:21px;font-weight:700;color:var(--primary-d);}
+.evt .days small{display:block;font-size:11px;color:var(--muted);}
+.evt .info{flex:1;}
+.evt .t{font-size:14px;}
+.evt .m{font-size:12px;color:var(--muted);}
+.evt.soon .days b{color:#dc2626;}
+.evt.past{opacity:.45;}
+.tp{font-size:11.5px;padding:1px 8px;border-radius:10px;background:var(--chip);color:var(--chip-t);white-space:nowrap;}
+
+/* ---- 成长记录时间线 ---- */
+.tl{position:relative;padding-left:6px;}
+.tl-item{position:relative;padding:0 0 16px 24px;border-left:2px solid var(--line);margin-left:6px;}
+.tl-item:last-child{padding-bottom:2px;border-left-color:transparent;}
+.tl-dot{position:absolute;left:-7px;top:5px;width:12px;height:12px;border-radius:50%;
+  background:var(--primary);border:2px solid #fff;box-shadow:0 0 0 1px var(--line);}
+.tl-body{background:#fafbfc;border:1px solid var(--line);border-radius:9px;padding:10px 12px;}
+.tl-item.fu .tl-body{background:#fffaf0;border-color:#efc98a;}
+.tl-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px;}
+.tl-date{font-size:12.5px;color:var(--muted);}
+.tl-text{font-size:14px;line-height:1.65;white-space:pre-wrap;word-break:break-word;}
+.tl-fu{font-size:12.5px;margin-top:6px;color:var(--warn);font-weight:500;}
+.tl-fu.done{color:var(--ok);}
+.tl-act{margin-top:7px;display:flex;gap:6px;flex-wrap:wrap;}
+.fu-hint{background:var(--warn-bg);color:#92610a;font-size:12.5px;padding:7px 11px;
+  border-radius:7px;margin-bottom:12px;}
+
+/* ---- 首页窄屏自适应 ----
+   必须放在所有主规则之后：媒体查询与主规则同优先级时，
+   后写的赢。放在前面会被后面的主规则覆盖掉（这坑踩过一次）。
+   2K 全屏（>1700px）用上面的大字号；窗口不够宽时收一档，避免内容被挤。 */
+@media(max-width:1700px){
+  .today-tbl th{font-size:14.5px;padding:10px 10px;}
+  .today-tbl th.p{width:58px;}
+  .today-tbl th.tm{width:140px;}
+  .today-tbl th.sb{width:112px;}
+  .today-tbl td{padding:12px 10px;}
+  .today-tbl td.p{font-size:16.5px;}
+  .today-tbl td.tm{font-size:15.5px;}
+  .today-tbl td.sb{font-size:18px;}
+  .today-tbl td.sb .tag{font-size:13px;padding:2px 10px;}
+  .today-tbl td.ct,.today-tbl td.hw{font-size:16px;}
+  .today-tbl td.ct .ph,.today-tbl td.hw .ph{font-size:15.5px;}
+  textarea.inline-edit{min-height:74px;font-size:16px;}
+  .dash-card{padding:18px 20px;}
+  .dash-card h2{font-size:20px;}
+  .dash-card .todo{padding:13px 5px;}
+  .dash-card .todo .txt{font-size:17px;}
+  .dash-card .todo .grip{font-size:18px;}
+  .dash-card .todo button.sm{font-size:15px;padding:7px 14px;}
+  .dash-card .tabs .tab{font-size:16px;padding:7px 16px;}
+  .dash-card .tabs button.sm{font-size:15px;padding:7px 14px;}
+  .dash-card .empty{font-size:16px;padding:28px;}
+  .dash-card .hint{font-size:14.5px;}
+  .dash-hero .big{font-size:26px;}
+  .dash-hero .d{font-size:16px;}
+  .dash-hero .muted{font-size:15.5px;}
+}
+
+@media print{
+  header,nav,.noprint{display:none!important;}
+  main{padding:0;}
+  body{background:#fff;}
+  .tl-body{background:#fff!important;border-color:#ccc!important;}
+  .tl-item.fu .tl-body{background:#fff!important;border-color:#999!important;}
+  .card{page-break-inside:avoid;}
+}
+
+/* ---- 课表：周次切换 + 固定课标记 ---- */
+/* 周次工具条：贴一条淡底色，和下面的课表格子分隔开 */
+.weekbar{align-items:flex-end;gap:8px;background:#f7f9fc;border:1px solid #e6ecf5;
+  border-radius:10px;padding:10px 12px;margin:10px 0 8px;}
+.weekbar .field{margin:0;}
+/* 固定课的📌：别用 emoji 原始大小，会把课程名顶歪 */
+.fx{font-size:11px;vertical-align:super;margin-left:2px;opacity:.85;}
+/* 弹窗里的勾选项（含说明文字）*/
+label.chk{display:block;margin:0 0 14px;padding:10px 12px;background:#f7f9fc;
+  border:1px solid #e6ecf5;border-radius:8px;font-size:14px;cursor:pointer;line-height:1.5;}
+label.chk input{vertical-align:-1px;margin-right:4px;}
+label.chk .hint{font-size:12.5px;}
+
+/* ---- 周次徽章：老师最关心「这周是第几周」，所以给它最醒目的位置 ---- */
+.wk-badge{display:flex;align-items:baseline;gap:8px;background:linear-gradient(135deg,#2f6fed,#1d4ed8);
+  color:#fff;padding:8px 16px;border-radius:10px;font-size:21px;font-weight:700;line-height:1.2;
+  white-space:nowrap;}
+.wk-badge em{font-style:normal;font-size:12px;font-weight:600;background:rgba(255,255,255,.24);
+  padding:2px 8px;border-radius:20px;align-self:center;}
+/* 看历史周时淡化，免得误以为是当前在用的课表 */
+.wk-badge.dim{background:#94a3b8;}
+.wk-badge.dim em{background:rgba(255,255,255,.28);}
+.wk-badge .muted{color:rgba(255,255,255,.85);font-size:15px;font-weight:500;}
+/* 标题里的小周次 */
+.card h2 .wk-no{color:var(--primary);}
+
+/* ---- 成绩一览（全员名单，可排序）---- */
+.score-board th{white-space:nowrap;}
+/* 可点击排序的表头：像按钮但仍是 th */
+.th-sort{cursor:pointer;user-select:none;display:inline-flex;align-items:center;gap:3px;
+  padding:2px 5px;margin:-2px -5px;border-radius:5px;transition:background .12s;}
+.th-sort:hover{background:#eef3fb;color:var(--text);}
+.th-sort.on{color:var(--primary);font-weight:700;}
+.th-sort em{font-style:normal;font-size:10px;}
+/* 缺考 / 未登记的行：淡黄底，一眼能扫出来（和名册表同色） */
+.score-board tr.row-abs{background:#fffbeb;}
+.score-board tr.row-abs td{color:var(--muted);}
+.score-board tbody tr:hover{background:#f7f9fc;}
+
+/* ===========================================================
+   首页四象限（2×2，右列更宽 44:56，四格等高）
+   四种极浅底 + 深色标题 + 细边框：浅色之间靠色相区分，
+   靠标题/文字的深色保证可读，不靠加深底色来做层次。
+   =========================================================== */
+.quad-grid{display:grid;grid-template-columns:44fr 56fr;grid-template-rows:1fr 1fr;
+  gap:16px;height:calc(100vh - 104px);min-height:600px;}
+.quad-cell{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative;
+  border:1px solid var(--q-line);border-radius:12px;background:var(--q-bg);padding:16px 18px;}
+.q-red  {--q-bg:#fdf1f1;--q-line:#eec9c9;--q-title:#a32d2d;--q-ink:#7a2727;--q-soft:#bd8a8a;}
+.q-blue {--q-bg:#eef5fd;--q-line:#c7dcf2;--q-title:#185fa5;--q-ink:#12456f;--q-soft:#7ba7cf;}
+.q-amber{--q-bg:#fdf6e8;--q-line:#ecd9ae;--q-title:#854f0b;--q-ink:#6b430f;--q-soft:#bda06b;}
+.q-green{--q-bg:#eef8f3;--q-line:#c3e2d3;--q-title:#0f6e56;--q-ink:#155c48;--q-soft:#7fb69e;}
+.q-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:0 0 auto;
+  padding-bottom:10px;margin-bottom:8px;border-bottom:1px solid var(--q-line);}
+.q-title{font-size:22px;font-weight:600;color:var(--q-title);letter-spacing:.5px;}
+.q-tools{display:flex;align-items:center;gap:10px;}
+.q-count{font-size:15px;color:var(--q-soft);white-space:nowrap;}
+button.q-add{width:34px;height:34px;padding:0;line-height:1;font-size:24px;border-radius:8px;
+  background:rgba(255,255,255,.7);color:var(--q-title);border:1px solid var(--q-line);}
+button.q-add:hover{background:#fff;color:var(--q-title);}
+.quad-items,.quad-classes{flex:1;min-height:0;overflow:auto;}
+
+/* 事项行 */
+.qi{display:flex;align-items:center;gap:8px;padding:11px 6px;position:relative;
+  border-bottom:1px solid var(--q-line);cursor:grab;}
+.qi:last-child{border-bottom:none;}
+.qi:hover{background:rgba(255,255,255,.5);}
+.qi-grip{flex:0 0 auto;color:var(--q-soft);font-size:18px;letter-spacing:-2px;user-select:none;}
+.qi-txt{flex:1;min-width:0;font-size:19px;line-height:1.5;color:var(--q-ink);word-break:break-word;cursor:text;}
+/* 截至时间列：定宽右对齐；没设时间时留白，但仍保留一个可双击的热区 */
+.qi-due{flex:0 0 auto;min-width:132px;text-align:right;white-space:nowrap;
+  font-size:15px;line-height:1.5;color:var(--q-soft);padding:2px 4px;
+  border-radius:6px;cursor:text;}
+.qi-due:hover{background:rgba(255,255,255,.6);}
+.qi-due.is-empty:hover{outline:1px dashed var(--q-line);}
+.qi-due.due-soon{color:#a16207;font-weight:600;background:rgba(250,238,218,.95);}
+.qi-due.due-over{color:#a32d2d;font-weight:600;background:rgba(252,235,235,.95);}
+.qi-due.editing{padding:0;outline:none;}
+.qi-due.editing:hover{background:transparent;}
+.qi-grip-blank{visibility:hidden;}
+.qi-act{display:flex;gap:4px;flex:0 0 auto;opacity:.28;transition:opacity .12s;}
+.qi:hover .qi-act{opacity:1;}
+.qi-act button{width:28px;height:28px;padding:0;line-height:1;font-size:16px;border-radius:6px;
+  background:rgba(255,255,255,.85);color:var(--q-title);border:1px solid var(--q-line);}
+.qi-act button:hover{background:#fff;color:var(--q-title);}
+input.qi-input{width:100%;font-size:19px;padding:6px 9px;border:1px solid var(--q-title);
+  border-radius:6px;background:#fff;color:var(--q-ink);}
+/* 新增行 / 整行编辑：文字框撑满，时间框定宽；优先级高于上面的 input.qi-input */
+.qi-new .qi-input-text,.qi.editing .qi-input-text{flex:1;width:auto;min-width:0;}
+.qi-new .qi-input-due,.qi-due.editing .qi-input-due{flex:0 0 132px;width:132px;
+  font-size:15px;box-sizing:border-box;}
+.qi-new .qi-act{min-width:56px;}
+.qi-new{padding:11px 6px;cursor:default;}
+/* 整行编辑（双击事项）：文字 + 截至时间两个框同时出现 */
+.qi.editing{cursor:default;}
+.qi.editing .qi-grip,.qi.editing .qi-act{visibility:hidden;}
+.qi.editing .qi-txt{display:flex;min-width:0;}
+.qi.editing .qi-input-text{min-width:0;}
+
+/* 历史记录页 */
+.hist-row{display:flex;align-items:center;gap:12px;padding:14px 6px;
+  border-bottom:1px solid var(--line);}
+.hist-row:last-child{border-bottom:none;}
+.hist-main{flex:1;min-width:0;}
+.hist-txt{font-size:17px;color:var(--text);word-break:break-word;}
+.hist-meta{font-size:13px;color:var(--muted);margin-top:5px;}
+.hist-row .badge{margin-right:4px;}
+/* 拖拽反馈 */
+.qi.dragging{opacity:.4;}
+.qi.drop-before{box-shadow:inset 0 2px 0 var(--q-title);}
+.qi.drop-after{box-shadow:inset 0 -2px 0 var(--q-title);}
+.qi.fading{opacity:0;transform:translateX(12px);transition:opacity .2s,transform .2s;}
+.quad-cell.drop-target{box-shadow:inset 0 0 0 2px var(--q-title);}
+/* 首页待办：临近 / 过期 整行鲜艳填充，2K 屏远距离一眼可见
+   warn = 橙色（提醒准备：带时刻且 ≤3 小时 / 只写日期且当天）
+   over = 红色（已过期） */
+.qi.warn{background:#ff9f43;border-radius:9px;box-shadow:inset 0 0 0 1px #d97706;}
+.qi.warn .qi-txt{color:#5a2b00;}
+.qi.warn .qi-due{color:#7a3b00;background:transparent;font-weight:600;}
+.qi.warn .qi-grip{color:rgba(90,43,0,.65);}
+.qi.warn .qi-act button{background:#fff;color:#d97706;border-color:#d97706;}
+.qi.warn:hover{background:#ff9f43;}
+.qi.over{background:#ef4444;border-radius:9px;box-shadow:inset 0 0 0 1px #b91c1c;}
+.qi.over .qi-txt{color:#fff;}
+.qi.over .qi-due{color:#ffe3e3;background:transparent;font-weight:600;}
+.qi.over .qi-grip{color:rgba(255,255,255,.8);}
+.qi.over .qi-act button{background:#fff;color:#dc2626;border-color:#dc2626;}
+.qi.over:hover{background:#ef4444;}
+/* warn/over 行去掉原本和象限同色的细底边，避免和填充叠出双线 */
+.qi.warn,.qi.over{border-bottom-color:transparent;}
+.qi.warn:last-child,.qi.over:last-child{border-bottom:none;}
+.quad-cell.reject::after{content:'课程看板不能放待办';position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;font-size:19px;color:#a32d2d;
+  background:rgba(253,241,241,.9);border:2px dashed #ddaaaa;border-radius:12px;pointer-events:none;}
+
+/* 第四格：课程行 + 本节任务 */
+.q-empty{padding:18px 4px;color:var(--q-soft);font-size:17px;}
+.qc-row{padding:12px 6px;border-bottom:1px solid var(--q-line);}
+.qc-row:last-child{border-bottom:none;}
+.qc-main{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.qc-p{font-size:18px;font-weight:600;color:var(--q-title);}
+.qc-time{font-size:16px;color:var(--q-soft);font-family:Consolas,Monaco,monospace;}
+.qc-sub{font-size:19px;font-weight:600;color:var(--q-ink);}
+.qc-cls{font-size:15px;color:var(--q-title);background:rgba(255,255,255,.75);
+  border:1px solid var(--q-line);border-radius:20px;padding:1px 9px;white-space:nowrap;}
+input.qc-task{width:100%;font-size:17px;padding:8px 10px;border:1px dashed var(--q-line);
+  border-radius:6px;background:rgba(255,255,255,.6);color:var(--q-ink);}
+input.qc-task::placeholder{color:var(--q-soft);}
+input.qc-task:focus{background:#fff;border-style:solid;border-color:var(--q-title);outline:none;}
+
+@media(max-width:1700px){
+  .q-title{font-size:20px;}
+  .qi-txt{font-size:18px;}
+  .qc-sub{font-size:18px;}
+  .qc-p{font-size:17px;}
+}
+@media(max-width:900px){
+  .quad-grid{grid-template-columns:1fr;grid-template-rows:repeat(4,minmax(260px,1fr));height:auto;}
+}
+/* 2K 屏（2560×1440）：内容字号整体再放大一档，远距离看也清楚 */
+@media(min-width:1701px){
+  .q-title{font-size:25px;}
+  .q-count{font-size:17px;}
+  button.q-add{width:38px;height:38px;font-size:26px;}
+  .qi{padding:14px 6px;}
+  .qi-grip{font-size:21px;}
+  .qi-txt,input.qi-input{font-size:23px;}
+  .reminder-title{font-size:27px;}
+  .reminder-meta,.reminder-tip{font-size:18px;}
+  .reminder-badge{font-size:16px;}
+  .sched th .wd-date{font-size:15px;}
+  .qi-due{font-size:18px;min-width:160px;}
+  .qi-new .qi-input-due,.qi-due.editing .qi-input-due{font-size:18px;width:160px;flex-basis:160px;}
+  .qi-new .qi-act{min-width:64px;}
+  .qi-new{padding:14px 6px;}
+  .qi-act button{width:30px;height:30px;font-size:17px;}
+  .quad-cell.reject::after{font-size:21px;}
+  .q-empty{font-size:19px;}
+  .qc-row{padding:14px 6px;}
+  .qc-p{font-size:20px;}
+  .qc-time{font-size:17px;}
+  .qc-sub,input.qc-task{font-size:21px;}
+  .qc-cls{font-size:16px;}
+  .hist-row{padding:18px 8px;}
+  .hist-txt{font-size:21px;}
+  .hist-meta{font-size:15px;}
+  .hist-row .badge,.hist-row button.sm{font-size:15px;padding:7px 14px;}
+}
